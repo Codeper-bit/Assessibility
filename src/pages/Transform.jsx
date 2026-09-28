@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import MainLayout from '../layouts/MainLayout.jsx'
 import { runTransform } from '../services/api.js'
+import ConceptCard from '../components/ConceptCard.jsx'
 
 export default function Transform() {
   const navigate = useNavigate()
   const [pastedText, setPastedText] = useState('')
   const [selectedFile, setSelectedFile] = useState(null)
-  const [result, setResult] = useState(null)
+  const [cards, setCards] = useState([])
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -16,7 +17,7 @@ export default function Transform() {
   const handleTransform = async () => {
     setIsLoading(true)
     setError(null)
-    setResult(null)
+    setCards([])
 
     try {
       const response = await runTransform({
@@ -27,7 +28,7 @@ export default function Transform() {
       if (response.status === 'error') {
         setError(response.message)
       } else {
-        setResult(response.message)
+        setCards(response.cards || [])
       }
     } catch (err) {
       setError(err.message || 'Something went wrong')
@@ -123,15 +124,19 @@ export default function Transform() {
           <h2 className="text-sm font-medium text-slate-900 mb-2">
             Visual transformation
           </h2>
-          <div className="rounded-lg border border-slate-200 bg-white p-4 h-48 flex items-center justify-center text-center text-sm">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 min-h-48">
             {error ? (
               <span className="text-rose-600">{error}</span>
-            ) : result ? (
-              <span className="text-slate-900">{result}</span>
+            ) : cards.length > 0 ? (
+              <div className="grid grid-cols-1 gap-3">
+                {cards.map((card, i) => (
+                  <ConceptCard key={i} {...card} />
+                ))}
+              </div>
             ) : (
-              <span className="text-slate-500">
+              <p className="pt-16 text-center text-sm text-slate-500">
                 Your visual learning experience will appear here.
-              </span>
+              </p>
             )}
           </div>
         </div>

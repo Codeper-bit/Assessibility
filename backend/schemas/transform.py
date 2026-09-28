@@ -1,6 +1,13 @@
 from pydantic import BaseModel
 
 
+class Card(BaseModel):
+    title: str
+    explanation: str
+    example: str | None = None
+
+
 class TransformResponse(BaseModel):
     status: str    # "ok" or "error"
-    message: str   # human-readable result or error message
+    cards: list[Card] = []
+    message: str | None = None   # human-readable result or error message
